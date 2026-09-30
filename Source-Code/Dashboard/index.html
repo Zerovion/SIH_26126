@@ -1,0 +1,29 @@
+<!doctype html><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>VISTRA Dashboard Starter</title>
+<style>
+body{margin:0;font-family:Arial;background:#071521;color:#eef6fb}header{padding:16px;background:#0b2233}
+main{display:grid;grid-template-columns:1.4fr .8fr;gap:12px;padding:12px}.card{background:#0c1e2c;border:1px solid #29485c;border-radius:10px;padding:12px}
+.k{font-size:11px;color:#9fb7c7}.big{font-size:24px;font-weight:700}.row{display:flex;gap:8px;flex-wrap:wrap}
+button{background:#153a54;border:1px solid #47738d;color:#fff;padding:8px;border-radius:7px}
+#map{width:100%;height:340px;background:#07131d}pre{white-space:pre-wrap;font-size:11px}
+</style>
+<header><b>VISTRA</b><div class=k>offline dashboard starter - synthetic values only</div></header>
+<main>
+<section class=card><div class=k>BEV RISK MAP</div><canvas id=map></canvas></section>
+<section class=card>
+<div class=big id=ncs>0.78</div><div class=k>NCS / <span id=state>NORMAL</span></div>
+<p><span class=k>TTC</span> <b id=ttc>4.2 s</b></p><p><span class=k>Speed</span> <b id=spd>0.8 m/s</b></p>
+<div class=row><button onclick=f('obstacle')>Spawn Obstacle</button><button onclick=f('blur')>Blur</button><button onclick=f('dark')>Dark</button><button onclick=f('reset')>Reset</button></div>
+<hr><div class=k>WHEEL COMMAND</div><p>v=<span id=v>0.8</span> | w=0.0 | left=<span id=l>0.8</span> | right=<span id=r>0.8</span></p>
+</section>
+<section class=card><div class=k>DECISION LOG</div><pre id=log>t=0 NORMAL: starter online</pre></section>
+<section class=card><div class=k>NOTE</div><p>This starter uses synthetic values. Replace with FastAPI/WebSocket telemetry after the core autonomy modules exist.</p></section>
+</main>
+<script>
+const c=document.getElementById('map'),x=c.getContext('2d');
+function resize(){c.width=c.clientWidth*devicePixelRatio;c.height=c.clientHeight*devicePixelRatio;draw()}addEventListener('resize',resize);
+function draw(){x.clearRect(0,0,c.width,c.height);x.strokeStyle='#1f4154';for(let i=20;i<c.width;i+=36){x.beginPath();x.moveTo(i,0);x.lineTo(i,c.height);x.stroke()}for(let j=20;j<c.height;j+=36){x.beginPath();x.moveTo(0,j);x.lineTo(c.width,j);x.stroke()}x.strokeStyle='#84b4c8';x.lineWidth=3;x.beginPath();x.moveTo(c.width*.15,c.height*.8);x.lineTo(c.width*.5,c.height*.55);x.lineTo(c.width*.8,c.height*.2);x.stroke()}resize();
+let t=0;function setv(n,s,tt,sp){ncs.textContent=n.toFixed(2);state.textContent=s;ttc.textContent=tt.toFixed(1)+' s';spd.textContent=sp.toFixed(1)+' m/s';v.textContent=sp.toFixed(1);l.textContent=sp.toFixed(1);r.textContent=sp.toFixed(1)}
+function logit(s){logEl.textContent='t='+(++t)+' '+s+'\n'+logEl.textContent}const logEl=document.getElementById('log');
+function f(k){if(k==='obstacle'){setv(.52,'CAUTION',1.8,.3);logit('CAUTION: obstacle injected; replan requested')}if(k==='blur'){setv(.31,'RECOVER',3,.1);logit('RECOVER: blur injected; relocalization requested')}if(k==='dark'){setv(.33,'RECOVER',3.1,.1);logit('RECOVER: dark frame injected')}if(k==='reset'){setv(.78,'NORMAL',4.2,.8);logit('NORMAL: reset')}}
+</script>
